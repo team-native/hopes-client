@@ -1,0 +1,52 @@
+.auth-shell { display: flex; min-height: 100vh; }
+
+/* Left brand panel (school official feel) */
+.auth-brand {
+  flex: 1.05; position: relative; overflow: hidden;
+  background: linear-gradient(180deg, #2E9BEE 0%, #1E80DE 50%, #1567C4 100%);
+  color: #fff; padding: 56px 60px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.auth-brand::after {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(600px 300px at 85% 15%, rgba(255,255,255,.16), transparent 70%),
+    radial-gradient(500px 360px at 10% 100%, rgba(255,255,255,.10), transparent 70%);
+  pointer-events: none;
+}
+.auth-brand-top { display: flex; align-items: center; gap: 12px; position: absolute; top: 56px; left: 60px; right: 60px; z-index: 1; }
+.auth-brand-top .brand-mark { width: 38px; height: 38px; border-radius: 11px; border: 1px solid rgba(255,255,255,.3); box-shadow: 0 4px 12px rgba(0,0,0,.12); }
+.auth-brand-top .school { font-size: 15px; font-weight: 600; opacity: .92; }
+.auth-brand-hero { position: relative; z-index: 1; margin-bottom: 6vh; }
+.auth-brand-hero h1 { font-size: 38px; line-height: 1.25; font-weight: 800; letter-spacing: -1px; margin: 0 0 18px; }
+.auth-brand-hero p { font-size: 15px; line-height: 1.7; font-weight: 400; opacity: .82; max-width: 420px; margin: 0; }
+.auth-brand-foot { position: absolute; bottom: 40px; left: 60px; z-index: 1; font-size: 13px; opacity: .7; }
+.auth-badges { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+.auth-badge { font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 999px; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.14); backdrop-filter: blur(6px); transition: background .15s, border-color .15s; cursor: default; }
+.auth-badge:hover { background: rgba(255,255,255,.3); border-color: rgba(255,255,255,.4); }
+
+/* Right form panel */
+.auth-form-pane { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 28px; background: var(--bg); overflow-y: auto; }
+.auth-card { width: 100%; max-width: 400px; margin: auto; }
+.auth-card h2 { margin: 0 0 6px; font-size: 25px; font-weight: 700; letter-spacing: -.5px; }
+.auth-card .subtitle { color: var(--muted); font-size: 14.5px; margin: 0 0 26px; }
+.auth-card button.full { width: 100%; margin-top: 26px; padding: 13px; font-size: 15px; font-weight: 700; border-radius: var(--radius); background: var(--brand); box-shadow: 0 6px 16px rgba(30,136,229,.30); }
+.auth-card button.full:hover { background: var(--brand-600); }
+.auth-links { display: flex; justify-content: center; margin-top: 22px; font-size: 13.5px; }
+.auth-links-text { color: var(--muted); }
+.auth-links a { color: var(--accent); font-weight: 700; }
+.auth-links a:hover { color: var(--accent-hover); text-decoration: underline; }
+.inline-row { display: flex; gap: 8px; align-items: stretch; }
+.inline-row > input { flex: 1; }
+.inline-row > button { white-space: nowrap; }
+.field { margin-bottom: 2px; }
+.auth-card .field input { border: 1.5px solid #d1d5db; padding: 12px 14px; }
+.auth-card .field input:focus { border-color: var(--brand); box-shadow: 0 0 0 3.5px var(--brand-50); }
+.keep-label { font-weight: 400 !important; display: flex; align-items: center; gap: 8px; color: var(--text-soft); margin-top: 8px; }
+.keep-label + button.full { margin-top: 14px; }
+.keep-label input { width: auto; }
+
+@media (max-width: 860px) {
+  .auth-brand { display: none; }
+  .auth-form-pane { padding: 28px 22px; }
+}

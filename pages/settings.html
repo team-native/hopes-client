@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>설정 · hopes</title>
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/settings.css" />
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="page-topbar">
+      <div class="page-brand">
+        <span class="brand-mark">h</span>
+        <span class="brand-text">
+          <span class="brand-title">hopes</span>
+          <span class="brand-sub">광주소프트웨어마이스터고</span>
+        </span>
+      </div>
+      <a class="back-link" href="/pages/chat.html">← 채팅으로</a>
+    </div>
+    <h1>설정</h1>
+
+    <!-- Menu -->
+    <div class="card settings-menu" id="menu-view">
+      <button class="secondary" data-go="general">일반</button>
+      <button class="secondary" data-go="personal">개인 설정</button>
+      <button class="secondary" id="contact-btn">문의하기</button>
+      <button class="danger" id="logout-btn">로그아웃</button>
+    </div>
+
+    <!-- General -->
+    <div class="card hidden" id="general-view">
+      <h2>일반 설정</h2>
+      <div class="toggle-row">
+        <span>다크 모드</span>
+        <label class="switch">
+          <input type="checkbox" id="theme-toggle" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="actions"><button class="ghost" data-back>← 뒤로</button></div>
+    </div>
+
+    <!-- Personal -->
+    <div class="card hidden" id="personal-view">
+      <h2>개인 설정</h2>
+      <label>시스템 프롬프트 (AI 응답 생성 시 반영됩니다)</label>
+      <textarea id="prompt" class="tall" placeholder="예: 답변은 항상 3문장 이내로 짧게 해줘."></textarea>
+      <div class="actions">
+        <button id="save-prompt-btn">프롬프트 저장</button>
+        <button class="danger" id="delete-all-btn">모든 대화 삭제</button>
+      </div>
+      <div class="actions"><button class="ghost" data-back>← 뒤로</button></div>
+    </div>
+  </div>
+
+  <script type="module" src="/js/settings.js"></script>
+</body>
+</html>

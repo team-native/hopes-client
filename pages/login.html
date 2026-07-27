@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>로그인 · hopes</title>
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/auth.css" />
+</head>
+<body>
+  <div class="auth-shell">
+    <!-- Brand panel -->
+    <section class="auth-brand">
+      <div class="auth-brand-top">
+        <span class="brand-mark">h</span>
+        <span class="school">hopes · 광주소프트웨어마이스터고</span>
+      </div>
+      <div class="auth-brand-hero">
+        <h1>선배에게 묻는<br />가장 솔직한 학교 이야기</h1>
+        <p>재학생·신입생·입학 희망자를 위한 AI 선배 챗봇. 기숙사 생활부터 전공 선택, 진로까지 실제 선배들의 경험으로 답해드려요.</p>
+        <div class="auth-badges">
+          <span class="auth-badge">기숙사 생활</span>
+          <span class="auth-badge">전공·진로</span>
+          <span class="auth-badge">입학 안내</span>
+        </div>
+      </div>
+      <div class="auth-brand-foot">© 광주소프트웨어마이스터고등학교 · GSM Chatbot</div>
+    </section>
+
+    <!-- Form panel -->
+    <section class="auth-form-pane">
+      <div class="auth-card">
+        <div id="login-view">
+          <h2>로그인</h2>
+          <p class="subtitle">아이디와 비밀번호로 로그인하고 선배에게 물어보세요.</p>
+          <div class="field">
+            <label>아이디</label>
+            <input id="username" placeholder="아이디 또는 학교 이메일" autocomplete="username" />
+            <span class="error-msg" id="err-username"></span>
+          </div>
+          <div class="field">
+            <label>비밀번호</label>
+            <input id="password" type="password" autocomplete="current-password" />
+            <span class="error-msg" id="err-password"></span>
+          </div>
+          <label class="keep-label"><input type="checkbox" id="keep" /> 로그인 유지</label>
+          <button class="full" id="login-btn">로그인</button>
+          <div class="auth-links">
+            <span class="auth-links-text">계정이 없으신가요? <a href="/pages/register.html">회원가입</a></span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script type="module" src="/js/auth.js"></script>
+</body>
+</html>
