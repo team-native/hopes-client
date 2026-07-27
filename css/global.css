@@ -92,6 +92,28 @@ a:hover { color: var(--accent-hover); }
   box-shadow: var(--shadow-xs);
 }
 
+/* 동아리 태그 — 학교명 옆에 붙는 Native 배지 */
+.club-tag {
+  display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0;
+  padding: 3px 9px 3px 4px; border-radius: 999px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  font-size: 11px; font-weight: 700; letter-spacing: -0.01em; line-height: 1;
+  white-space: nowrap;
+}
+.club-tag .club-mark {
+  width: 16px; height: 16px; border-radius: 5px; flex-shrink: 0;
+  background: #fff url("/assets/native-logo.svg") center / contain no-repeat;
+  box-shadow: var(--shadow-xs);
+}
+/* 작은 브랜드 라인(사이드바·설정 상단)용 축소 버전 */
+.brand-sub .club-tag {
+  margin-left: 6px; vertical-align: middle;
+  font-size: 10px; padding: 2px 7px 2px 3px;
+}
+.brand-sub .club-tag .club-mark { width: 13px; height: 13px; border-radius: 4px; }
+
 /* Inputs */
 input, select, textarea {
   width: 100%;

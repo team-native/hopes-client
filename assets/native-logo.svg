@@ -1,0 +1,17 @@
+<svg viewBox="0 0 680 680" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Native">
+  <defs>
+    <linearGradient id="nGradA" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0%" stop-color="#FFDC5E"/>
+      <stop offset="100%" stop-color="#FFC42E"/>
+    </linearGradient>
+    <linearGradient id="nGradB" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0%" stop-color="#FDF0B4"/>
+      <stop offset="100%" stop-color="#FBE184"/>
+    </linearGradient>
+  </defs>
+  <rect x="10" y="10" width="660" height="660" rx="130" fill="#FFFFFF"/>
+  <g transform="rotate(13 340 340)">
+    <rect x="158" y="188" width="150" height="304" rx="75" fill="url(#nGradA)"/>
+    <rect x="348" y="188" width="150" height="304" rx="75" fill="url(#nGradB)"/>
+  </g>
+</svg>
