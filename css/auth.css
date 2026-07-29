@@ -17,6 +17,8 @@
 .auth-brand-top { display: flex; align-items: center; gap: 12px; position: absolute; top: 56px; left: 60px; right: 60px; z-index: 1; }
 .auth-brand-top .brand-mark { width: 38px; height: 38px; border-radius: 11px; border: 1px solid rgba(255,255,255,.3); box-shadow: 0 4px 12px rgba(0,0,0,.12); }
 .auth-brand-top .school { font-size: 15px; font-weight: 600; opacity: .92; }
+.auth-brand-top .club-tag { margin-left: -4px; background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.28); color: #fff; backdrop-filter: blur(6px); }
+.auth-brand-top .club-tag .club-mark { box-shadow: 0 2px 6px rgba(0,0,0,.14); }
 .auth-brand-hero { position: relative; z-index: 1; margin-bottom: 6vh; }
 .auth-brand-hero h1 { font-size: 38px; line-height: 1.25; font-weight: 800; letter-spacing: -1px; margin: 0 0 18px; }
 .auth-brand-hero p { font-size: 15px; line-height: 1.7; font-weight: 400; opacity: .82; max-width: 420px; margin: 0; }
