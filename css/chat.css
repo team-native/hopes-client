@@ -38,6 +38,14 @@
 .chat-item:hover { background: var(--bg-hover); color: var(--text); }
 .chat-item.active { background: var(--accent-soft); color: var(--accent-hover); font-weight: 600; box-shadow: inset 3px 0 0 var(--accent); }
 .chat-item.active:hover { background: var(--accent-soft); color: var(--accent-hover); }
+/* 대화 목록 다음 페이지 (GET /main?page=) */
+.load-more {
+  width: calc(100% - 12px); margin: 8px 6px 4px; padding: 8px;
+  background: none; border: 1px dashed var(--border-strong); border-radius: var(--radius-sm);
+  color: var(--muted); font-size: 12.5px; font-weight: 600; box-shadow: none;
+}
+.load-more:hover:not(:disabled) { background: var(--bg-hover); color: var(--text); }
+.load-more:disabled { opacity: .6; cursor: default; }
 .chat-title { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .chat-actions { display: flex; align-items: center; gap: 1px; flex-shrink: 0; }

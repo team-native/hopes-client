@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>비밀번호 재설정 · hopes</title>
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/auth.css" />
+</head>
+<body>
+  <div class="auth-shell">
+    <!-- Brand panel -->
+    <section class="auth-brand">
+      <div class="auth-brand-top">
+        <span class="brand-mark">h</span>
+        <span class="school">hopes · 광주소프트웨어마이스터고</span>
+        <span class="club-tag"><span class="club-mark" aria-hidden="true"></span>Native</span>
+      </div>
+      <div class="auth-brand-hero">
+        <h1>비밀번호를<br />잊으셨나요?</h1>
+        <p>가입할 때 사용한 학교 이메일로 인증번호를 보내드려요. 인증번호를 확인하면 새 비밀번호로 바꿀 수 있습니다.</p>
+        <div class="auth-badges">
+          <span class="auth-badge">학교 이메일 인증</span>
+          <span class="auth-badge">6자리 인증번호</span>
+        </div>
+      </div>
+      <div class="auth-brand-foot">© 광주소프트웨어마이스터고등학교 · GSM Chatbot</div>
+    </section>
+
+    <!-- Form panel -->
+    <section class="auth-form-pane">
+      <div class="auth-card">
+        <h2>비밀번호 재설정</h2>
+        <p class="subtitle">학교 이메일(s00000@gsm.hs.kr)로 인증번호를 받아 새 비밀번호를 설정하세요.</p>
+
+        <div class="field">
+          <label>이메일</label>
+          <div class="inline-row">
+            <input id="email" type="email" placeholder="s20000@gsm.hs.kr" autocomplete="username" />
+            <button class="secondary" id="pw-send-btn" type="button">인증번호 전송</button>
+          </div>
+          <span class="error-msg" id="err-email"></span>
+        </div>
+
+        <div class="field">
+          <label>인증번호</label>
+          <input id="code" placeholder="이메일로 받은 6자리 숫자" inputmode="numeric" maxlength="6" />
+          <span class="code-hint" id="code-hint"></span>
+          <span class="error-msg" id="err-code"></span>
+        </div>
+
+        <div class="field">
+          <label>새 비밀번호</label>
+          <input id="new-password" type="password" placeholder="영문+숫자 포함 8~15자" autocomplete="new-password" />
+          <span class="error-msg" id="err-password"></span>
+        </div>
+
+        <div class="field">
+          <label>새 비밀번호 확인</label>
+          <input id="new-password2" type="password" autocomplete="new-password" />
+          <span class="error-msg" id="err-password2"></span>
+        </div>
+
+        <button class="full" id="pw-reset-btn">비밀번호 변경</button>
+        <div class="auth-links">
+          <span class="auth-links-text">비밀번호가 기억나셨나요? <a href="/pages/login.html">로그인</a></span>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script type="module" src="/js/auth.js"></script>
+</body>
+</html>

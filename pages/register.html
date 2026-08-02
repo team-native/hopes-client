@@ -35,7 +35,7 @@
         <div class="field">
           <label>이메일</label>
           <div class="inline-row">
-            <input id="email" type="email" placeholder="s20000@gsm.hs.kr" />
+            <input id="email" type="email" placeholder="s20000@gsm.hs.kr" maxlength="255" />
             <button class="secondary" id="send-code-btn" type="button">인증번호 전송</button>
           </div>
           <span class="error-msg" id="err-email"></span>
@@ -46,13 +46,14 @@
             <input id="code" placeholder="이메일로 받은 6자리 숫자" inputmode="numeric" maxlength="6" />
             <button class="secondary" id="confirm-code-btn" type="button">확인</button>
           </div>
+          <span class="code-hint" id="code-hint"></span>
           <span class="error-msg" id="err-code"></span>
         </div>
 
         <fieldset id="signup-fields" disabled style="border:none;padding:0;margin:0;opacity:.5;">
           <div class="field">
             <label>아이디</label>
-            <input id="username" placeholder="로그인에 사용할 아이디" />
+            <input id="username" placeholder="로그인에 사용할 아이디" maxlength="50" />
             <span class="error-msg" id="err-username"></span>
           </div>
           <div class="field">
@@ -67,17 +68,23 @@
           </div>
           <div class="row">
             <div class="field">
-              <label>성별</label>
-              <select id="gender"><option value="남">남</option><option value="여">여</option></select>
+              <label>성별 <span class="optional">(선택)</span></label>
+              <select id="gender">
+                <option value="">선택 안 함</option>
+                <option value="남">남</option>
+                <option value="여">여</option>
+              </select>
             </div>
             <div class="field">
-              <label>기수</label>
-              <input id="cohort" type="number" placeholder="예: 8" />
+              <label>기수 <span class="optional">(선택)</span></label>
+              <input id="cohort" type="number" min="1" max="100" placeholder="예: 8" />
+              <span class="error-msg" id="err-cohort"></span>
             </div>
           </div>
           <div class="field">
-            <label>전공</label>
+            <label>전공 <span class="optional">(선택)</span></label>
             <select id="major">
+              <option value="">선택 안 함</option>
               <option value="소프트웨어개발과">소프트웨어개발과</option>
               <option value="임베디드소프트웨어과">임베디드소프트웨어과</option>
               <option value="인공지능소프트웨어과">인공지능소프트웨어과</option>

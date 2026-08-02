@@ -5,6 +5,9 @@ if (!requireAuth()) throw new Error('redirect');
 const $ = (id) => document.getElementById(id);
 const views = { menu: $('menu-view'), general: $('general-view'), personal: $('personal-view') };
 
+// 명세서 기준 상한: customPrompt 최대 4,000자 / inquiry content 최대 4,000자
+const MAX_TEXT = 4000;
+
 function show(name) {
   Object.entries(views).forEach(([k, el]) => el.classList.toggle('hidden', k !== name));
 }
@@ -24,6 +27,7 @@ $('contact-btn').onclick = async () => {
   if (content === null) return;
   const text = content.trim();
   if (!text) return toast('내용을 입력해주세요.', 'error');
+  if (text.length > MAX_TEXT) return toast(`문의는 ${MAX_TEXT.toLocaleString()}자까지 입력할 수 있어요.`, 'error');
   const r = await api('/setting/inquiry', { method: 'POST', auth: true, body: { content: text } });
   toast(r.ok ? '문의가 접수되었습니다.' : r.message, r.ok ? 'success' : 'error');
 };
@@ -38,19 +42,32 @@ themeToggle.onchange = async () => {
   setTheme(next);
 };
 
-/* ---- Load menu data (GET /setting/main): theme + customPrompt ---- */
+/* ---- Load menu data (GET /setting/main): theme + customPrompt + 메뉴 상태 ---- */
+// SettingMainResponse 하나로 화면 상태를 맞춘다. PATCH /setting 응답도 같은 형식이라 재사용한다.
+function applySettingMain(d) {
+  const localTheme = fromApiTheme(d.theme);
+  setTheme(localTheme);
+  themeToggle.checked = localTheme === 'dark';
+  $('prompt').value = d.customPrompt || '';
+  // 서버가 내려주는 메뉴 노출 상태(logout / inquiry)를 그대로 따른다.
+  $('logout-btn').classList.toggle('hidden', d.logout === false);
+  $('contact-btn').classList.toggle('hidden', d.inquiry === false);
+}
+
 async function loadSettingMain() {
   const r = await api('/setting/main', { auth: true });
   if (!r.ok) return toast(r.message, 'error');
-  const localTheme = fromApiTheme(r.data.theme);
-  setTheme(localTheme);
-  themeToggle.checked = localTheme === 'dark';
-  $('prompt').value = r.data.customPrompt || '';
+  applySettingMain(r.data);
 }
 
 /* ---- Personal prompt (PATCH /setting) ---- */
 $('save-prompt-btn').onclick = async () => {
-  const r = await api('/setting', { method: 'PATCH', auth: true, body: { customPrompt: $('prompt').value } });
+  const customPrompt = $('prompt').value;
+  if (customPrompt.length > MAX_TEXT) {
+    return toast(`프롬프트는 ${MAX_TEXT.toLocaleString()}자까지 저장할 수 있어요. (현재 ${customPrompt.length.toLocaleString()}자)`, 'error');
+  }
+  const r = await api('/setting', { method: 'PATCH', auth: true, body: { customPrompt } });
+  if (r.ok && r.data) applySettingMain(r.data);
   toast(r.ok ? '프롬프트가 저장되었습니다.' : r.message, r.ok ? 'success' : 'error');
 };
 
@@ -72,6 +89,7 @@ $('delete-all-btn').onclick = () => {
   backdrop.querySelector('#m-ok').onclick = async () => {
     const r = await api('/setting', { method: 'PATCH', auth: true, body: { deleteAllChats: true } });
     backdrop.remove();
+    if (r.ok && r.data) applySettingMain(r.data);
     toast(r.ok ? '모든 대화가 삭제되었습니다.' : r.message, r.ok ? 'success' : 'error');
   };
 };

@@ -24,21 +24,21 @@
     <div class="card">
       <h2>프로필</h2>
       <label>아이디</label>
-      <input id="username" />
+      <input id="username" maxlength="50" />
       <span class="error-msg" id="err-username"></span>
 
       <label>닉네임</label>
-      <input id="nickname" />
+      <input id="nickname" maxlength="50" />
       <span class="error-msg" id="err-nickname"></span>
 
       <label>프로필 이미지 URL</label>
       <div class="inline-row">
-        <input id="profileImage" placeholder="https://..." />
+        <input id="profileImage" placeholder="https://..." maxlength="255" />
         <img id="profile-preview" alt="" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:1px solid var(--border);" />
       </div>
 
       <label>자기소개 (AI 응답 개인화에 활용됩니다)</label>
-      <textarea id="bio" class="tall" placeholder="예: 프론트엔드에 관심 많은 8기 학생이에요."></textarea>
+      <textarea id="bio" class="tall" maxlength="2000" placeholder="예: 프론트엔드에 관심 많은 8기 학생이에요."></textarea>
 
       <div class="actions">
         <button id="save-btn">저장</button>

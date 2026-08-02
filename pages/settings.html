@@ -46,7 +46,7 @@
     <div class="card hidden" id="personal-view">
       <h2>개인 설정</h2>
       <label>시스템 프롬프트 (AI 응답 생성 시 반영됩니다)</label>
-      <textarea id="prompt" class="tall" placeholder="예: 답변은 항상 3문장 이내로 짧게 해줘."></textarea>
+      <textarea id="prompt" class="tall" maxlength="4000" placeholder="예: 답변은 항상 3문장 이내로 짧게 해줘."></textarea>
       <div class="actions">
         <button id="save-prompt-btn">프롬프트 저장</button>
         <button class="danger" id="delete-all-btn">모든 대화 삭제</button>

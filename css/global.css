@@ -155,6 +155,11 @@ button.danger:hover { filter: brightness(1.07); }
 svg { display: block; }
 
 .error-msg { color: var(--error); font-size: 12.5px; min-height: 15px; margin-top: 5px; display: block; }
+/* 인증번호 유효시간 안내 (만료되면 경고색) */
+.code-hint { color: var(--muted); font-size: 12.5px; margin-top: 5px; display: block; }
+.code-hint.expired { color: var(--error); font-weight: 600; }
+/* 선택 입력 항목 라벨 뱃지 */
+.optional { color: var(--muted); font-size: 12px; font-weight: 400; }
 
 .row { display: flex; gap: 10px; }
 .row > * { flex: 1; }

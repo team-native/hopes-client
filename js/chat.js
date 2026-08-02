@@ -1,4 +1,4 @@
-import { api, requireAuth, toast, logout } from './common.js';
+import { api, qs, requireAuth, toast, logout } from './common.js';
 import { renderMarkdown } from './markdown.js';
 
 if (!requireAuth()) throw new Error('redirect');
@@ -8,9 +8,27 @@ const messagesEl = $('messages');
 const listEl = $('chat-list');
 const input = $('composer-input');
 
+// 명세서 기준 상한: GET /main size 최대 100, GET /chats/{id} messageSize 최대 100,
+// POST /chats/{id}/messages content 최대 12,000자.
+const CHAT_PAGE_SIZE = 50;
+const MESSAGE_PAGE_SIZE = 100;
+const MAX_CONTENT = 12000;
+const MAX_KEYWORD = 255;
+
 let currentChatId = null;
 let streaming = false;
 let msgCol = null;
+
+// 메시지 페이징 상태 (GET /chats/{id} messagePage / hasMoreMessages)
+let msgItems = [];
+let msgPage = 0;
+let msgHasMore = false;
+
+// 대화 목록 페이징 상태
+let chatPage = 0;
+let chatKeyword = '';
+let chatItems = [];
+let chatHasMore = false;
 
 // 일관된 라인 아이콘 세트 (feather 스타일)
 const LINE_ICON = {
@@ -85,12 +103,77 @@ function addMessage(role, text) {
 function scrollToBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }
 const roleOf = (m) => (m.role === 'ASSISTANT' ? 'ai' : 'user');
 
-/* ---------- Chat list (GET /main) ---------- */
-async function loadChats(activeId, keyword) {
-  const q = keyword ? `?searchKeyword=${encodeURIComponent(keyword)}` : '';
-  const r = await api(`/main${q}`, { auth: true });
-  if (r.ok) renderChatList(r.data.chatList, activeId);
-  else listEl.innerHTML = `<div class="chat-item" style="cursor:default;color:var(--muted)">${r.message}</div>`;
+/* ---------- Message store ----------
+   서버가 messagePage를 어느 방향(오래된 순/최신 순)으로 주더라도 화면 순서가 깨지지 않도록
+   받은 메시지를 id로 합치고 createdAt(동률이면 id) 기준으로 정렬해 통째로 다시 그린다. */
+const msgKey = (m) => (m.id != null ? `id:${m.id}` : `${m.role}:${m.content}`);
+function sortMsgs(a, b) {
+  const ta = Date.parse(a.createdAt || '');
+  const tb = Date.parse(b.createdAt || '');
+  if (!isNaN(ta) && !isNaN(tb) && ta !== tb) return ta - tb;
+  return (a.id || 0) - (b.id || 0);
+}
+function mergeMessages(list) {
+  const map = new Map(msgItems.map((m) => [msgKey(m), m]));
+  (list || []).forEach((m) => map.set(msgKey(m), m));
+  msgItems = [...map.values()].sort(sortMsgs);
+}
+function resetMessages() {
+  msgItems = [];
+  msgPage = 0;
+  msgHasMore = false;
+  msgCol = null;
+  messagesEl.innerHTML = '';
+}
+function renderMessages() {
+  if (!msgItems.length) return showEmptyState();
+  messagesEl.innerHTML = '';
+  msgCol = null;
+  const col = ensureCol();
+  if (msgHasMore) col.appendChild(moreMessagesBtn());
+  msgItems.forEach((m) => addMessage(roleOf(m), m.content));
+  scrollToBottom();
+}
+
+// 이전(추가) 메시지 페이지를 불러오는 버튼. 목록 맨 위에 붙는다.
+function moreMessagesBtn() {
+  const btn = document.createElement('button');
+  btn.className = 'load-more';
+  btn.textContent = '이전 메시지 더 보기';
+  btn.onclick = async () => {
+    btn.disabled = true;
+    btn.textContent = '불러오는 중…';
+    const next = msgPage + 1;
+    const r = await api(`/chats/${currentChatId}${qs({ messagePage: next, messageSize: MESSAGE_PAGE_SIZE })}`, { auth: true });
+    if (!r.ok) { btn.disabled = false; btn.textContent = '이전 메시지 더 보기'; return toast(r.message, 'error'); }
+    msgPage = next;
+    msgHasMore = !!r.data.hasMoreMessages;
+    const keepTop = messagesEl.scrollHeight - messagesEl.scrollTop;
+    mergeMessages(r.data.messages);
+    renderMessages();
+    // 새로 붙은 만큼 스크롤 위치를 보정해 읽던 지점을 유지한다.
+    messagesEl.scrollTop = messagesEl.scrollHeight - keepTop;
+  };
+  return btn;
+}
+
+/* ---------- Chat list (GET /main?searchKeyword&page&size) ---------- */
+// append=true 면 다음 페이지를 기존 목록 뒤에 이어 붙인다.
+async function loadChats(activeId, keyword, { append = false } = {}) {
+  if (!append) { chatPage = 0; chatItems = []; chatKeyword = keyword || ''; }
+
+  const r = await api(`/main${qs({ searchKeyword: chatKeyword, page: chatPage, size: CHAT_PAGE_SIZE })}`, { auth: true });
+  if (!r.ok) {
+    if (!append) listEl.innerHTML = `<div class="chat-item" style="cursor:default;color:var(--muted)">${r.message}</div>`;
+    else toast(r.message, 'error');
+    return;
+  }
+
+  const page = r.data.chatList || [];
+  chatItems = append ? chatItems.concat(page) : page;
+  // 서버가 주는 hasNext를 그대로 쓰고, 없으면 페이지가 꽉 찼는지로 판단한다.
+  chatHasMore = r.data.hasNext ?? (page.length === CHAT_PAGE_SIZE);
+  renderChatList(chatItems, activeId);
 }
 
 // created_at(ISO, e.g. 2024-01-01T12:00:00Z)을 오늘/어제/지난 7일/이전 버킷으로.
@@ -134,14 +217,30 @@ function renderChatList(chats, activeId) {
     listEl.appendChild(label);
     items.forEach((c) => listEl.appendChild(makeItem(c, activeId)));
   });
+
+  if (chatHasMore) {
+    const more = document.createElement('button');
+    more.className = 'load-more';
+    more.textContent = '이전 대화 더 보기';
+    more.onclick = async () => {
+      more.disabled = true;
+      more.textContent = '불러오는 중…';
+      chatPage += 1;
+      await loadChats(activeId, chatKeyword, { append: true });
+    };
+    listEl.appendChild(more);
+  }
 }
 
 async function openChat(chatId) {
-  const r = await api(`/chats/${chatId}`, { auth: true });
+  const r = await api(`/chats/${chatId}${qs({ messagePage: 0, messageSize: MESSAGE_PAGE_SIZE })}`, { auth: true });
   if (!r.ok) return toast(r.message, 'error');
   currentChatId = chatId;
-  if (r.data.messages.length === 0) showEmptyState();
-  else { ensureCol(); r.data.messages.forEach((m) => addMessage(roleOf(m), m.content)); }
+  // 이전 대화 내용이 남지 않도록 항상 비우고 새로 그린다.
+  resetMessages();
+  msgHasMore = !!r.data.hasMoreMessages;
+  mergeMessages(r.data.messages);
+  renderMessages();
   loadChats(chatId);
   openSidebar(false);
 }
@@ -151,6 +250,7 @@ $('new-chat-btn').onclick = async () => {
   const r = await api('/chats', { method: 'POST', auth: true, body: {} });
   if (!r.ok) return toast(r.message, 'error');
   currentChatId = r.data.id;
+  resetMessages();
   showEmptyState();
   loadChats(currentChatId);
   openSidebar(false);
@@ -162,6 +262,7 @@ $('search-btn').onclick = doSearch;
 $('search-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
 function doSearch() {
   const q = $('search-input').value.trim();
+  if (q.length > MAX_KEYWORD) return toast(`검색어는 ${MAX_KEYWORD}자까지 입력할 수 있어요.`, 'error');
   loadChats(currentChatId, q || undefined);
 }
 
@@ -175,6 +276,9 @@ async function send() {
   if (streaming) return;
   const text = input.value.trim();
   if (!text) return;
+  if (text.length > MAX_CONTENT) {
+    return toast(`질문은 ${MAX_CONTENT.toLocaleString()}자까지 보낼 수 있어요. (현재 ${text.length.toLocaleString()}자)`, 'error');
+  }
   input.value = ''; autoGrow();
   streaming = true;
   $('send-btn').disabled = true;
@@ -192,8 +296,16 @@ async function send() {
     }
     const r = await api(`/chats/${currentChatId}/messages`, { method: 'POST', auth: true, body: { content: text } });
     if (!r.ok) { aiBubble.textContent = r.message; return; }
-    const last = [...r.data.messages].reverse().find((m) => m.role === 'ASSISTANT');
-    aiBubble.innerHTML = last ? renderMarkdown(last.content) : '(응답이 비어 있어요)';
+    const last = [...(r.data.messages || [])].reverse().find((m) => m.role === 'ASSISTANT');
+    if (!last) { aiBubble.innerHTML = '(응답이 비어 있어요)'; return; }
+    // 응답에 방금 보낸 질문이 들어 있으면 서버 목록으로 화면 전체를 맞춘다.
+    // (낙관적으로 그린 임시 말풍선이 실제 메시지로 교체된다)
+    if (r.data.messages.some((m) => m.role === 'USER' && m.content === text)) {
+      mergeMessages(r.data.messages);
+      renderMessages();
+    } else {
+      aiBubble.innerHTML = renderMarkdown(last.content);
+    }
   } catch {
     aiBubble.textContent = '연결 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
   } finally {

@@ -38,6 +38,9 @@
 .auth-links-text { color: var(--muted); }
 .auth-links a { color: var(--accent); font-weight: 700; }
 .auth-links a:hover { color: var(--accent-hover); text-decoration: underline; }
+.auth-links-sub { margin-top: 10px; font-size: 13px; }
+.auth-links-sub a { color: var(--muted); font-weight: 500; }
+.auth-links-sub a:hover { color: var(--accent); }
 .inline-row { display: flex; gap: 8px; align-items: stretch; }
 .inline-row > input { flex: 1; }
 .inline-row > button { white-space: nowrap; }
