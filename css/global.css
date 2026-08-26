@@ -86,7 +86,7 @@ a:hover { color: var(--accent-hover); }
 /* Brand mark — 로고 SVG. 기존 마크업의 "h" 텍스트는 숨김. */
 .brand-mark {
   width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
-  background: #fff url("/assets/logo.svg") center / contain no-repeat;
+  background: #fff url("/assets/hopes.png") center / contain no-repeat;
   display: inline-flex; align-items: center; justify-content: center;
   color: transparent; overflow: hidden; text-indent: -9999px;
   box-shadow: var(--shadow-xs);

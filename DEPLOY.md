@@ -16,7 +16,7 @@ localhost에서만 백엔드를 직접 부르고, 배포 환경에서는 상대�
 |---|---|---|
 | 80 | Caddy | `https://ssh.gsmsv.site/`로 308 리다이렉트 |
 | 443 | Caddy | 포트는 열렸는데 **인증서 없음** — TLS 핸드셰이크 실패 |
-| 25105 | nginx | 스프링으로 프록시. 정상 동작 |
+| 22116 | Spring API | `http://service.gsmsv.site:22116`에서 직접 제공 |
 
 Caddy에 `ssh.gsmsv.site` 사이트는 등록돼 있으나 ACME 인증서 발급이 실패한 상태다.
 Caddy를 쓰면 인증서가 자동 발급되므로 https까지 같이 해결된다.
@@ -28,7 +28,7 @@ Caddy를 쓰면 인증서가 자동 발급되므로 https까지 같이 해결된
 ```bash
 cd "/c/Users/master/Documents/MYH hopes/front"
 tar czf - --exclude=.git --exclude=server.js --exclude=DEPLOY.md . \
-  | ssh <계정>@ssh.gsmsv.site "mkdir -p ~/hopes-front-upload && tar xzf - -C ~/hopes-front-upload"
+  | ssh -p 21116 <계정>@ssh.gsmsv.site "mkdir -p ~/hopes-front-upload && tar xzf - -C ~/hopes-front-upload"
 ```
 
 서버에서 웹 루트로 옮긴다.
@@ -49,7 +49,7 @@ git으로 관리하려면 서버에서 `git clone` 후 배포 때마다 `git pul
 ssh.gsmsv.site {
 	encode gzip
 
-	# API는 스프링으로. <스프링포트>는 nginx가 25105에서 프록시하는 그 포트.
+	# API는 새 Spring API 포트(22116)로 프록시한다.
 	handle /api/* {
 		reverse_proxy 127.0.0.1:<스프링포트>
 	}
@@ -125,10 +125,11 @@ sudo nginx -t && sudo systemctl reload nginx
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" https://ssh.gsmsv.site/            # 200
 curl -s -o /dev/null -w "%{http_code}\n" https://ssh.gsmsv.site/pages/login.html   # 200
-curl -s -w "\n%{http_code}\n" https://ssh.gsmsv.site/api/main               # 401 {"message":"로그인이 필요합니다"}
+curl -s -w "\n%{http_code}\n" http://service.gsmsv.site:22116/api/main # 401 {"message":"로그인이 필요합니다"}
 ```
 
 브라우저에서:
 - 로그인 → 채팅 화면 진입
-- DevTools Network에서 요청 주소가 `https://ssh.gsmsv.site/api/...` 인지 (`:25105` 아님)
+- 로컬 개발 시 DevTools Network에서 요청 주소가 `http://service.gsmsv.site:22116/api/...` 인지 확인
+- 배포 환경에서는 프론트 도메인의 `/api/...`로 요청되는지 확인
 - Console에 mixed content 경고 없는지
