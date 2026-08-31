@@ -190,6 +190,8 @@ function dateBucket(iso) {
 
 const GROUP_ORDER = ['오늘', '어제', '지난 7일', '이전'];
 
+const TRASH_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>';
+
 function makeItem(c, activeId) {
   const item = document.createElement('div');
   item.className = 'chat-item' + (c.id === activeId ? ' active' : '');
@@ -197,6 +199,18 @@ function makeItem(c, activeId) {
   title.className = 'chat-title';
   title.textContent = c.title || '새 대화';
   item.append(title);
+
+  const actions = document.createElement('div');
+  actions.className = 'chat-actions';
+  const del = document.createElement('button');
+  del.className = 'chat-act';
+  del.type = 'button';
+  del.title = '대화 삭제';
+  del.innerHTML = TRASH_SVG;
+  del.onclick = (e) => { e.stopPropagation(); deleteChat(c); };
+  actions.append(del);
+  item.append(actions);
+
   item.onclick = () => openChat(c.id);
   return item;
 }
@@ -232,6 +246,49 @@ function renderChatList(chats, activeId) {
   }
 }
 
+// 공용 확인 모달. 확인=true / 취소·바깥클릭=false 로 resolve.
+function confirmModal({ title, body, okText = '삭제' }) {
+  return new Promise((resolve) => {
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop';
+    backdrop.innerHTML = `
+      <div class="modal">
+        <h3></h3>
+        <p></p>
+        <div class="row">
+          <button class="secondary" data-act="cancel">취소</button>
+          <button class="danger" data-act="ok"></button>
+        </div>
+      </div>`;
+    backdrop.querySelector('h3').textContent = title;
+    backdrop.querySelector('p').textContent = body;
+    backdrop.querySelector('[data-act="ok"]').textContent = okText;
+    const close = (v) => { backdrop.remove(); resolve(v); };
+    backdrop.querySelector('[data-act="cancel"]').onclick = () => close(false);
+    backdrop.querySelector('[data-act="ok"]').onclick = () => close(true);
+    backdrop.onclick = (e) => { if (e.target === backdrop) close(false); };
+    document.body.appendChild(backdrop);
+  });
+}
+
+// 대화 1건 삭제 (DELETE /chats/{id})
+async function deleteChat(c) {
+  const ok = await confirmModal({
+    title: '대화 삭제',
+    body: `"${c.title || '새 대화'}" 대화를 삭제할까요? 이 작업은 되돌릴 수 없습니다.`,
+  });
+  if (!ok) return;
+  const r = await api(`/chats/${c.id}`, { method: 'DELETE', auth: true });
+  if (!r.ok) return toast(r.message, 'error');
+  toast('대화를 삭제했어요.', 'success');
+  if (c.id === currentChatId) {
+    currentChatId = null;
+    resetMessages();
+    showEmptyState();
+  }
+  loadChats(currentChatId);
+}
+
 async function openChat(chatId) {
   const r = await api(`/chats/${chatId}${qs({ messagePage: 0, messageSize: MESSAGE_PAGE_SIZE })}`, { auth: true });
   if (!r.ok) return toast(r.message, 'error');
@@ -245,14 +302,14 @@ async function openChat(chatId) {
   openSidebar(false);
 }
 
-/* ---------- New chat (POST /chats) ---------- */
-$('new-chat-btn').onclick = async () => {
-  const r = await api('/chats', { method: 'POST', auth: true, body: {} });
-  if (!r.ok) return toast(r.message, 'error');
-  currentChatId = r.data.id;
+/* ---------- New chat ----------
+   서버에 빈 대화가 쌓이지 않도록 여기서는 화면만 비운다.
+   실제 POST /chats 는 첫 메시지를 보낼 때 send()에서 만든다. */
+$('new-chat-btn').onclick = () => {
+  currentChatId = null;
   resetMessages();
   showEmptyState();
-  loadChats(currentChatId);
+  loadChats(null);
   openSidebar(false);
   input.focus();
 };

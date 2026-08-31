@@ -53,11 +53,12 @@
   width: 26px; height: 26px; padding: 0; flex-shrink: 0;
   display: inline-flex; align-items: center; justify-content: center;
   background: transparent; color: var(--muted); border-radius: 6px;
-  opacity: 0; transition: opacity .12s, background .12s, color .12s;
+  opacity: .5; transition: opacity .12s, background .12s, color .12s;
 }
 .chat-item:hover .chat-act, .chat-item.active .chat-act { opacity: 1; }
+@media (hover: none) { .chat-act { opacity: 1; } }
 .chat-item.pinned .chat-act.pin { opacity: 1; }            /* 고정된 대화는 핀을 항상 표시 */
-.chat-act:hover { background: var(--border); color: var(--text); }
+.chat-act:hover { background: var(--border); color: var(--error); }
 .chat-act.pin.on { color: var(--accent); }
 
 /* 대화 항목 드롭다운 메뉴 */

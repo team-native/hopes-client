@@ -89,7 +89,12 @@ a:hover { color: var(--accent-hover); }
   background: #fff url("/assets/hopes.png") center / contain no-repeat;
   display: inline-flex; align-items: center; justify-content: center;
   color: transparent; overflow: hidden; text-indent: -9999px;
-  box-shadow: var(--shadow-xs);
+  box-shadow: 0 2px 6px rgba(16,24,40,.16), 0 1px 2px rgba(16,24,40,.10),
+              inset 0 0 0 1px rgba(16,24,40,.06);
+}
+[data-theme="dark"] .brand-mark {
+  box-shadow: 0 2px 8px rgba(0,0,0,.5), 0 1px 2px rgba(0,0,0,.4),
+              inset 0 0 0 1px rgba(255,255,255,.08);
 }
 
 /* 동아리 태그 — 학교명 옆에 붙는 Native 배지 */
