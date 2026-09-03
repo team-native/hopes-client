@@ -233,17 +233,48 @@ if ($('pw-reset-btn')) {
 
 /* ============ LOGIN PAGE (POST /login) ============ */
 if ($('login-btn')) {
+  /* 서버는 로그인 실패를 상태 코드 + 단일 message로만 준다.
+     message 내용으로 갈래를 나눠 아이디 / 비밀번호 칸에 맞게 뿌린다. */
+  const routeLoginError = (r) => {
+    const m = r.message || '';
+    // 시도 횟수 초과 · 일시 잠금 → 비밀번호 칸(재시도 안내)
+    if (r.status === 429 || /시도|초과|잠시 후|잠겼|잠금/.test(m)) {
+      return setErr('err-password', m || '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.');
+    }
+    // 정지 · 비활성 · 탈퇴된 계정 → 아이디 칸
+    if (r.status === 403 || /정지|비활성|탈퇴|사용할 수 없|차단/.test(m)) {
+      return setErr('err-username', m || '사용할 수 없는 계정입니다.');
+    }
+    // 등록된 회원 없음(아이디/이메일 문제) → 아이디 칸
+    if (/회원|아이디|이메일|등록|찾을 수 없|존재하지|없습니다/.test(m)) {
+      return setErr('err-username', m || '등록된 회원을 찾을 수 없습니다.');
+    }
+    // 비밀번호 불일치 → 비밀번호 칸
+    if (/비밀번호|암호|일치/.test(m)) return setErr('err-password', m);
+    // 분류 실패분은 비밀번호 칸 + 토스트로 함께 노출
+    setErr('err-password', m);
+    if (m) toast(m, 'error');
+  };
+
   $('login-btn').onclick = async () => {
     clearErrs();
     const username = $('username').value.trim();
     const password = $('password').value;
     const keep = $('keep').checked;
-    if (!username) return setErr('err-username', '아이디를 입력해주세요.');
+
+    let bad = false;
+    if (!username) {
+      setErr('err-username', '아이디 또는 학교 이메일을 입력해주세요.'); bad = true;
+    } else if (username.includes('@') && !EMAIL_RE.test(username)) {
+      setErr('err-username', EMAIL_MSG); bad = true;
+    }
+    if (!password) { setErr('err-password', '비밀번호를 입력해주세요.'); bad = true; }
+    if (bad) return;
+
     const r = await api('/login', { method: 'POST', body: { username, password } });
     if (!r.ok) {
       if (showFieldErrors(r, { username: 'err-username', password: 'err-password' })) return;
-      // 401(등록된 회원 없음 / 비밀번호 오류), 429(시도 초과)는 단일 message로 온다.
-      return setErr(r.status === 429 ? 'err-username' : 'err-password', r.message);
+      return routeLoginError(r);
     }
     saveAuth(r.data.accessToken, keep);
     location.href = '/pages/chat.html';
