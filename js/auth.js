@@ -234,25 +234,27 @@ if ($('pw-reset-btn')) {
 /* ============ LOGIN PAGE (POST /login) ============ */
 if ($('login-btn')) {
   /* 서버는 로그인 실패를 상태 코드 + 단일 message로만 준다.
-     message 내용으로 갈래를 나눠 아이디 / 비밀번호 칸에 맞게 뿌린다. */
+     계정 존재 여부는 노출하지 않는다(회원없음·비밀번호오류를 한 문구로 병합).
+     단, 재시도 안내(429)·계정 정지(403)는 사용자가 조치해야 하므로 구분해서 보여준다. */
+  const BAD_CREDENTIALS = '아이디 또는 비밀번호가 올바르지 않습니다.';
   const routeLoginError = (r) => {
     const m = r.message || '';
+    // 네트워크 단절(status 0) → 자격증명 문제 아님, 토스트로만
+    if (r.status === 0) return toast(m || '서버에 연결할 수 없습니다.', 'error');
     // 시도 횟수 초과 · 일시 잠금 → 비밀번호 칸(재시도 안내)
     if (r.status === 429 || /시도|초과|잠시 후|잠겼|잠금/.test(m)) {
       return setErr('err-password', m || '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.');
     }
-    // 정지 · 비활성 · 탈퇴된 계정 → 아이디 칸
+    // 정지 · 비활성 · 탈퇴된 계정 → 아이디 칸(관리자 문의 유도)
     if (r.status === 403 || /정지|비활성|탈퇴|사용할 수 없|차단/.test(m)) {
-      return setErr('err-username', m || '사용할 수 없는 계정입니다.');
+      return setErr('err-username', m || '사용할 수 없는 계정입니다. 관리자에게 문의해주세요.');
     }
-    // 등록된 회원 없음(아이디/이메일 문제) → 아이디 칸
-    if (/회원|아이디|이메일|등록|찾을 수 없|존재하지|없습니다/.test(m)) {
-      return setErr('err-username', m || '등록된 회원을 찾을 수 없습니다.');
+    // 회원없음(401/404) · 비밀번호 불일치 → 구분 없이 비밀번호 칸에 병합 문구
+    if (r.status === 401 || r.status === 404 || /비밀번호|암호|일치|회원|등록|찾을 수 없/.test(m)) {
+      return setErr('err-password', BAD_CREDENTIALS);
     }
-    // 비밀번호 불일치 → 비밀번호 칸
-    if (/비밀번호|암호|일치/.test(m)) return setErr('err-password', m);
-    // 분류 실패분은 비밀번호 칸 + 토스트로 함께 노출
-    setErr('err-password', m);
+    // 그 외(5xx 등) → 비밀번호 칸 + 토스트
+    setErr('err-password', m || BAD_CREDENTIALS);
     if (m) toast(m, 'error');
   };
 
