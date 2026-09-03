@@ -45,8 +45,10 @@
 .inline-row > input { flex: 1; }
 .inline-row > button { white-space: nowrap; }
 .field { margin-bottom: 2px; }
-.auth-card .field input { border: 1.5px solid #d1d5db; padding: 12px 14px; }
-.auth-card .field input:focus { border-color: var(--brand); box-shadow: 0 0 0 3.5px var(--brand-50); }
+.auth-card .field input,
+.auth-card .field select { border: 1.5px solid #d1d5db; padding: 12px 14px; }
+.auth-card .field input:focus,
+.auth-card .field select:focus { border-color: var(--brand); box-shadow: 0 0 0 3.5px var(--brand-50); }
 .keep-label { font-weight: 400 !important; display: flex; align-items: center; gap: 8px; color: var(--text-soft); margin-top: 8px; }
 .keep-label + button.full { margin-top: 14px; }
 .keep-label input { width: auto; }
