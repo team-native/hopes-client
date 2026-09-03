@@ -279,7 +279,11 @@ async function deleteChat(c) {
   });
   if (!ok) return;
   const r = await api(`/chats/${c.id}`, { method: 'DELETE', auth: true });
-  if (!r.ok) return toast(r.message, 'error');
+  // 성공은 204 No Content. 본인 소유가 아니거나 없는 대화면 404.
+  if (!r.ok) {
+    if (r.status === 404) { toast('이미 삭제된 대화예요.', 'info'); loadChats(currentChatId); return; }
+    return toast(r.message, 'error');
+  }
   toast('대화를 삭제했어요.', 'success');
   if (c.id === currentChatId) {
     currentChatId = null;
