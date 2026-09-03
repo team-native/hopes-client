@@ -78,7 +78,12 @@
             </div>
             <div class="field">
               <label>기수 <span class="optional">(선택)</span></label>
-              <input id="cohort" type="number" min="1" max="100" placeholder="예: 8" />
+              <select id="cohort">
+                <option value="">선택 안 함</option>
+                <option value="8">8기</option>
+                <option value="9">9기</option>
+                <option value="10">10기</option>
+              </select>
               <span class="error-msg" id="err-cohort"></span>
             </div>
           </div>

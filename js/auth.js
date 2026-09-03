@@ -140,9 +140,9 @@ if ($('register-btn')) {
     else if (username.length > 50) { setErr('err-username', '아이디는 50자까지 입력할 수 있습니다.'); bad = true; }
     if (!PW_RE.test(password)) { setErr('err-password', '비밀번호는 영문과 숫자를 포함하여 8~15자여야 합니다.'); bad = true; }
     if (password !== passwordConfirm) { setErr('err-password2', '비밀번호가 일치하지 않습니다'); bad = true; }
-    // 기수는 선택 입력이지만 넣는다면 1~100 범위여야 한다.
-    if (cohort !== null && (!Number.isInteger(cohort) || cohort < 1 || cohort > 100)) {
-      setErr('err-cohort', '기수는 1~100 사이 숫자여야 합니다.'); bad = true;
+    // 기수는 선택 입력이지만 넣는다면 8·9·10기 중 하나여야 한다.
+    if (cohort !== null && ![8, 9, 10].includes(cohort)) {
+      setErr('err-cohort', '기수는 8·9·10기 중에서 선택해주세요.'); bad = true;
     }
     if (bad) return;
 
