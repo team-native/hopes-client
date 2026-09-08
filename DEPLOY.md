@@ -54,6 +54,20 @@ ssh.gsmsv.site {
 		reverse_proxy 127.0.0.1:<스프링포트>
 	}
 
+	# HTML 파일명 대신 짧은 URL을 사용한다.
+	redir /pages/chat.html /chat 301
+	redir /pages/login.html /login 301
+	redir /pages/register.html /register 301
+	redir /pages/forgot.html /forgot-password 301
+	redir /pages/mypage.html /mypage 301
+	redir /pages/settings.html /settings 301
+	rewrite /chat /pages/chat.html
+	rewrite /login /pages/login.html
+	rewrite /register /pages/register.html
+	rewrite /forgot-password /pages/forgot.html
+	rewrite /mypage /pages/mypage.html
+	rewrite /settings /pages/settings.html
+
 	# 나머지는 정적 파일
 	handle {
 		root * /var/www/hopes-front
@@ -124,7 +138,8 @@ sudo nginx -t && sudo systemctl reload nginx
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" https://ssh.gsmsv.site/            # 200
-curl -s -o /dev/null -w "%{http_code}\n" https://ssh.gsmsv.site/pages/login.html   # 200
+curl -s -o /dev/null -w "%{http_code}\n" https://ssh.gsmsv.site/login   # 200
+curl -s -I https://ssh.gsmsv.site/pages/login.html   # Location: /login
 curl -s -w "\n%{http_code}\n" http://service.gsmsv.site:22116/api/main # 401 {"message":"로그인이 필요합니다"}
 ```
 

@@ -5,7 +5,8 @@ import { API_BASE } from './config.js';
 
 // ---- Theme (persisted) ----
 export function initTheme() {
-  const authPage = /\/pages\/(login|register)\.html$/.test(location.pathname);
+  const authPage = /\/(login|register)(?:\.html)?$/.test(location.pathname)
+    || /\/pages\/(login|register)\.html$/.test(location.pathname);
   const t = authPage ? 'light' : (localStorage.getItem('theme') || 'light');
   document.documentElement.setAttribute('data-theme', t);
   return t;
@@ -32,10 +33,10 @@ export function getAccessToken() { return getStore().getItem('accessToken'); }
 export function logout() {
   localStorage.removeItem('accessToken');
   sessionStorage.removeItem('accessToken');
-  location.href = '/pages/login.html';
+  location.href = '/login';
 }
 export function requireAuth() {
-  if (!getAccessToken()) { location.href = '/pages/login.html'; return false; }
+  if (!getAccessToken()) { location.href = '/login'; return false; }
   return true;
 }
 

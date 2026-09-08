@@ -16,10 +16,43 @@ const MIME = {
   '.json': 'application/json',
 };
 
+// Keep implementation files private from the address bar. These aliases also
+// make direct navigation and refresh work on clean URLs during local development.
+const ROUTES = {
+  '/': 'index.html',
+  '/chat': 'pages/chat.html',
+  '/login': 'pages/login.html',
+  '/register': 'pages/register.html',
+  '/forgot-password': 'pages/forgot.html',
+  '/mypage': 'pages/mypage.html',
+  '/settings': 'pages/settings.html',
+};
+const LEGACY_ROUTES = {
+  '/pages/chat.html': '/chat',
+  '/pages/login.html': '/login',
+  '/pages/register.html': '/register',
+  '/pages/forgot.html': '/forgot-password',
+  '/pages/mypage.html': '/mypage',
+  '/pages/settings.html': '/settings',
+};
+
 http.createServer(async (req, res) => {
-  const urlPath = decodeURIComponent(req.url.split('?')[0]);
-  const filePath = path.join(__dirname, urlPath === '/' ? 'index.html' : urlPath);
-  if (!filePath.startsWith(__dirname)) { res.writeHead(403); return res.end('Forbidden'); }
+  const requestUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  const urlPath = decodeURIComponent(requestUrl.pathname);
+
+  if (LEGACY_ROUTES[urlPath]) {
+    const target = LEGACY_ROUTES[urlPath] + requestUrl.search;
+    res.writeHead(301, { Location: target });
+    return res.end();
+  }
+
+  const relativePath = ROUTES[urlPath] || urlPath.replace(/^\/+/, '');
+  const filePath = path.resolve(__dirname, relativePath);
+  const rootPath = path.resolve(__dirname);
+  if (filePath !== rootPath && !filePath.startsWith(`${rootPath}${path.sep}`)) {
+    res.writeHead(403);
+    return res.end('Forbidden');
+  }
   try {
     const data = await readFile(filePath);
     res.writeHead(200, { 'Content-Type': MIME[path.extname(filePath)] || 'application/octet-stream' });

@@ -17,8 +17,8 @@ function showFieldErrors(r, map) {
 }
 
 // Already logged in? skip
-if (getAccessToken() && /login\.html|register\.html|forgot\.html/.test(location.pathname)) {
-  location.replace('/pages/chat.html');
+if (getAccessToken() && /\/(login|register|forgot-password)(?:\.html)?$/.test(location.pathname)) {
+  location.replace('/chat');
 }
 
 const EMAIL_RE = /^[A-Za-z0-9._%+-]+@gsm\.hs\.kr$/i;
@@ -167,7 +167,7 @@ if ($('register-btn')) {
     }
     saveAuth(r.data.accessToken, true);
     toast('회원가입 완료!', 'success');
-    location.href = '/pages/chat.html';
+    location.href = '/chat';
   };
 }
 
@@ -227,7 +227,7 @@ if ($('pw-reset-btn')) {
     localStorage.removeItem('accessToken');
     sessionStorage.removeItem('accessToken');
     toast('비밀번호가 변경되었습니다. 다시 로그인해주세요.', 'success');
-    setTimeout(() => location.replace('/pages/login.html'), 1000);
+    setTimeout(() => location.replace('/login'), 1000);
   };
 }
 
@@ -279,7 +279,7 @@ if ($('login-btn')) {
       return routeLoginError(r);
     }
     saveAuth(r.data.accessToken, keep);
-    location.href = '/pages/chat.html';
+    location.href = '/chat';
   };
   document.addEventListener('keydown', (e) => { if (e.key === 'Enter') $('login-btn').click(); });
 }
